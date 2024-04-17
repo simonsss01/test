@@ -8,7 +8,7 @@
 #include <strings.h>
 #include <sys/mman.h>
 #include "font.h"
-
+extern struct LcdDevice* lcd;
 //封装在任意位置显示任意大小的bmp图片
 int show_anybmp(int w,int h,int x,int y,const char *bmpname)
 {
@@ -16,7 +16,7 @@ int show_anybmp(int w,int h,int x,int y,const char *bmpname)
 	int lcdfd;
 	int i,j;
 	//定义int类型的指针指向lcd在显存中的首地址
-	int *lcdmem;
+	unsigned int *lcdmem;
 
 	//定义数组存放像素点的RGB
 	char bmpbuf[w*h*3];
@@ -31,7 +31,7 @@ int show_anybmp(int w,int h,int x,int y,const char *bmpname)
 		return -1;
 	}
 	
-	//打开lcd的驱动
+	/* //打开lcd的驱动
 	lcdfd=open("/dev/fb0",O_RDWR);
 	if(lcdfd==-1)
 	{
@@ -45,7 +45,10 @@ int show_anybmp(int w,int h,int x,int y,const char *bmpname)
 	{
 		perror("映射lcd");
 		return -1;
-	}
+	} */
+	
+	lcdfd = lcd->fd;
+	lcdmem = lcd->mp;
 	
 	//跳过前面没有用的54字节
 	lseek(bmpfd,54,SEEK_SET);
@@ -75,9 +78,9 @@ int show_anybmp(int w,int h,int x,int y,const char *bmpname)
 	
 	//关闭
 	close(bmpfd);
-	close(lcdfd);
-	//解除映射
-	munmap(lcdmem,800*480*4);
+	//close(lcdfd);
+	/* //解除映射
+	munmap(lcdmem,800*480*4); */
 	return 0;
 }
 
